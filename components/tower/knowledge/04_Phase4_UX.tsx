@@ -27,6 +27,12 @@ const Phase4UX: React.FC = () => {
                         </p>
                         <ul className="text-[11px] text-slate-400 list-disc pl-4 space-y-2">
                             <li>
+                                <strong className="text-blue-300">BroadcastChannel Simulering:</strong> Vi använder <code>BroadcastChannel</code> i <code>useDataChannel.ts</code> som en lokal "drop-in replacement" för WebRTC. Detta gör att vi kan testa fjärrstyrning och P2P-synkronisering mellan webbläsarflikar direkt på en dator, innan vi kopplar in Cloudflare SFU.
+                            </li>
+                            <li>
+                                <strong className="text-blue-300">Late Joiner (State Sync):</strong> Vi implementerar en "Handskakning". När en ny klient ansluter till ett rum, skickar den en <code>REQUEST_FULL_STATE</code> via DataChannel, och en Admin-klient svarar med den aktuella sanningen (<code>SYNC_STATE</code>). Detta förhindrar osynkad state (Split-brain).
+                            </li>
+                            <li>
                                 När en Admin eller Teacher ändrar mötestillstånd (t.ex. byter från "Gudstjänst" till "Söndagsskola"), skickas en signal via WebRTC DataChannels.
                             </li>
                             <li>
@@ -65,37 +71,18 @@ const Phase4UX: React.FC = () => {
                     </div>
                 </div>
 
-                {/* 3. LÄRARENS KNAPP */}
-                <div className="space-y-4 pt-4 border-t border-slate-800">
-                    <h4 className="text-orange-400 font-bold text-xs uppercase tracking-widest border-l-4 border-orange-500 pl-3">3. "Lärarens Knapp" (Spela upp AI i Salen)</h4>
-                    
-                    <div className="bg-slate-950 p-4 rounded border border-slate-800 space-y-3">
-                        <p className="text-[11px] text-slate-300">
-                            Det ska finnas en tydlig toggle-knapp i UI:t (enbart synlig för Admin/Teacher) som heter "Tillåt översättning i Salen".
-                        </p>
-                        <p className="text-[11px] text-slate-400">
-                            Denna knapp är kopplad till den GainNode i ljudmotorn (Fas 3) som släpper fram AI-rösten till den lokala högtalaren (Vänster kanal i Pro Mode, eller standardhögtalaren i Simple Mode). Som standard är denna AV (mutad) för att undvika oavsiktliga utrop i rummet.
-                        </p>
-                    </div>
-                </div>
-
-                {/* 4. QR-KODER */}
-                <div className="space-y-4 pt-4 border-t border-slate-800">
-                    <h4 className="text-cyan-400 font-bold text-xs uppercase tracking-widest border-l-4 border-cyan-500 pl-3">4. QR-koder för Privata Rum</h4>
-                    
-                    <div className="bg-slate-950 p-4 rounded border border-slate-800 space-y-3">
-                        <p className="text-[11px] text-slate-300">
-                            UI:t måste kunna generera och visa en QR-kod baserat på rummets unika hash/URL, så att deltagare i ett fysiskt rum snabbt kan scanna och hoppa in i samma SFU-rum.
-                        </p>
-                    </div>
-                </div>
-
                 {/* 5. UI & SÄKERHET */}
                 <div className="space-y-4 pt-4 border-t border-slate-800">
                     <h4 className="text-yellow-400 font-bold text-xs uppercase tracking-widest border-l-4 border-yellow-500 pl-3">5. UI & Säkerhet</h4>
                     
                     <div className="bg-slate-950 p-4 rounded border border-slate-800 space-y-3">
                         <ul className="text-[11px] text-slate-400 list-disc pl-4 space-y-2">
+                            <li>
+                                <strong className="text-yellow-300">Zero Trust & Säkerhet:</strong> Mottagaren tillämpar "Zero Trust". Admin-kommandon (<code>ADMIN_MUTE_ALL</code> etc.) ignoreras strikt om avsändarens roll inte är verifierad som Admin/Teacher.
+                            </li>
+                            <li>
+                                <strong className="text-yellow-300">Stale Closures:</strong> WebRTC/Broadcast-listeners får aldrig förlita sig på reaktiva hook-värden, utan måste alltid läsa färskt state via <code>useAppStore.getState()</code>.
+                            </li>
                             <li>
                                 <strong className="text-yellow-300">Visuell AI-status:</strong> UI-indikatorer (t.ex. pulserande ikoner/animationer) som visar i realtid om AI:n "Lyssnar", "Tänker" eller "Talar".
                             </li>
