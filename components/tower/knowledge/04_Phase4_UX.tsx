@@ -71,6 +71,25 @@ const Phase4UX: React.FC = () => {
                     </div>
                 </div>
 
+                {/* 3. SÄKERHETSARKITEKTUR & STABILITET */}
+                <div className="space-y-4 pt-4 border-t border-slate-800">
+                    <h4 className="text-red-400 font-bold text-xs uppercase tracking-widest border-l-4 border-red-500 pl-3">3. Säkerhetsarkitektur & Stabilitet</h4>
+                    
+                    <div className="bg-slate-950 p-4 rounded border border-slate-800 space-y-3">
+                        <ul className="text-[11px] text-slate-400 list-disc pl-4 space-y-3">
+                            <li>
+                                <strong className="text-red-300">Zero-Trust URL Roles (Admin PIN):</strong> URL-parametrar som <code>?role=admin</code> är endast önskemål. Appen MÅSTE blockera tillgången och kräva en PIN-kod (verifierad mot miljövariabel) innan admin-rättigheter faktiskt tilldelas i Zustand.
+                            </li>
+                            <li>
+                                <strong className="text-red-300">Hard Teardown (Zombie Protection):</strong> Vi använder Reacts key-mönster (t.ex. <code>&lt;Room key=&#123;roomId&#125; /&gt;</code>). Vid varje ändring av rums-ID i URL:en måste hela rums-komponenten avmonteras brutalt för att stänga gamla WebSockets, WebRTC-kanaler och AudioContexts utan risk för läckage (Zombie Connections).
+                            </li>
+                            <li>
+                                <strong className="text-red-300">Strict Boot Sequence (Hydration Barrier):</strong> Nätverks- och ljudmotorer har startförbud vid sidladdning. De får anropas först när URL-parametrar är parsade, rollen är validerad via PIN och Zustand är fullt uppdaterat.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
                 {/* 5. UI & SÄKERHET */}
                 <div className="space-y-4 pt-4 border-t border-slate-800">
                     <h4 className="text-yellow-400 font-bold text-xs uppercase tracking-widest border-l-4 border-yellow-500 pl-3">5. UI & Säkerhet</h4>
