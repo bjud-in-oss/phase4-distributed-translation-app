@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { VAD_CONFIG } from '../utils/vadLogic';
+import { useAppStore } from '../stores/useAppStore';
 
 export function useLiveConfig() {
     // UPDATED: Start empty, load from localStorage
@@ -18,7 +19,9 @@ export function useLiveConfig() {
         localStorage.setItem('app_target_languages', JSON.stringify(targetLanguages));
     }, [targetLanguages]);
 
-    const [currentRoom, setCurrentRoom] = useState("Stora salen");
+    const { roomState, setRoomId } = useAppStore();
+    const currentRoom = roomState.roomId || "Stora salen";
+    const setCurrentRoom = setRoomId;
     
     // Configurable Parameters
     const [minTurnDuration, setMinTurnDuration] = useState<number>(VAD_CONFIG.MIN_TURN_DURATION_DEFAULT);

@@ -10,8 +10,9 @@ import LanguageSelectorModal from './components/LanguageSelectorModal';
 import ControlBar from './components/ControlBar';
 import Tower from './components/Tower';
 import SystemPromptModal from './components/SystemPromptModal'; 
+import PinCodeModal from './components/PinCodeModal';
 import { AudioGroup } from './types';
-import { useAppStore } from './stores/useAppStore';
+import { useAppStore, UserRole } from './stores/useAppStore';
 
 const ALL_LANGUAGES = [
   "Afrikaans",
@@ -106,7 +107,7 @@ const ALL_LANGUAGES = [
 
 const LOCAL_MODE_NAME = "Lokalt i min mobil";
 
-const App: React.FC = () => {
+const RoomSession: React.FC = () => {
   useEffect(() => {
   const handleBeforeUnload = (e: BeforeUnloadEvent) => {
     // Hämta aktuellt state direkt från storen utan att trigga re-renders
@@ -236,6 +237,9 @@ const App: React.FC = () => {
 
   const handleRoomChange = (room: string) => {
       setCurrentRoom(room);
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('room', room);
+      window.history.pushState({}, '', newUrl.toString());
   };
 
   const [lastActiveGroupId, setLastActiveGroupId] = useState<number | null>(null);
@@ -425,6 +429,59 @@ const App: React.FC = () => {
       )}
     </div>
   );
+};
+
+const App: React.FC = () => {
+  const [isBooting, setIsBooting] = useState(true);
+  const [pendingRole, setPendingRole] = useState<UserRole | null>(null);
+  const { roomState, setRoomId, setUserRole } = useAppStore();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roleParam = params.get('role') as UserRole | null;
+    const roomParam = params.get('room');
+
+    if (roomParam) {
+      setRoomId(roomParam);
+    } else if (!roomState.roomId) {
+      setRoomId('Stora salen');
+      // Update URL silently
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('room', 'Stora salen');
+      window.history.replaceState({}, '', newUrl.toString());
+    }
+
+    if (roleParam === 'admin' || roleParam === 'teacher') {
+      setPendingRole(roleParam);
+    } else {
+      setUserRole('listener');
+    }
+
+    setIsBooting(false);
+  }, []);
+
+  if (isBooting) {
+    return (
+      <div className="h-screen w-screen bg-[#101010] flex items-center justify-center text-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-slate-400 font-mono tracking-widest uppercase">Initierar system...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (pendingRole) {
+    return (
+      <PinCodeModal 
+        expectedRole={pendingRole} 
+        onSuccess={() => { setUserRole(pendingRole); setPendingRole(null); }} 
+        onCancel={() => { setUserRole('listener'); setPendingRole(null); }} 
+      />
+    );
+  }
+
+  return <RoomSession key={roomState.roomId} />;
 };
 
 export default App;

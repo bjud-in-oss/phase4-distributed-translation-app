@@ -86,6 +86,23 @@ const RoomList: React.FC<RoomListProps> = ({
               </button>
           );
       })}
+
+      <div className="pt-4 mt-2 border-t border-slate-800">
+          <button
+              onClick={() => {
+                  const privateRoomId = `privat-${Math.random().toString(36).substring(2, 7)}`;
+                  onSelect(privateRoomId);
+                  // Allow state to update before confirming
+                  setTimeout(onConfirm, 0);
+              }}
+              className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-center transition-all border border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white hover:border-slate-500"
+          >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="text-sm font-medium">Skapa Privat Rum</span>
+          </button>
+      </div>
     </div>
   );
 };

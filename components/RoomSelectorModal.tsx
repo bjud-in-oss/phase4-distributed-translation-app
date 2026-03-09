@@ -152,6 +152,37 @@ const RoomSelectorModal: React.FC<RoomSelectorModalProps> = ({
             onConfirm={confirmSelection}
             setMobileFocus={setMobileFocus}
           />
+
+          {/* DELA INBJUDAN SECTION */}
+          <div className="p-4 border-t border-slate-800 bg-slate-900/50 shrink-0">
+              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Dela inbjudan</h3>
+              <div className="flex gap-4 items-center">
+                  <div className="w-20 h-20 bg-white rounded-lg p-1 shrink-0">
+                      <img 
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(tempSelection)}&role=listener`)}`} 
+                          alt="QR Code" 
+                          className="w-full h-full object-contain"
+                      />
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      <p className="text-[10px] text-slate-500 mb-1 truncate">
+                          {`${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(tempSelection)}&role=listener`}
+                      </p>
+                      <button 
+                          onClick={() => {
+                              navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(tempSelection)}&role=listener`);
+                              // Optional: Add a small toast or visual feedback here if desired
+                          }}
+                          className="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                      >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          </svg>
+                          Kopiera länk
+                      </button>
+                  </div>
+              </div>
+          </div>
         </div>
 
         {/* --- RIGHT PANEL (MAP) --- */}
