@@ -77,7 +77,6 @@ export function useGeminiSession(callbacks: SessionCallbacks) {
             const ai = new GoogleGenAI({ apiKey: config.apiKey });
             
             // DYNAMIC CONFIGURATION
-            // Only add outputAudioTranscription if enabled
             const sessionConfig = {
                 model: 'gemini-2.5-flash-native-audio-preview-12-2025',
                 config: {
@@ -85,10 +84,8 @@ export function useGeminiSession(callbacks: SessionCallbacks) {
                   speechConfig: { 
                       voiceConfig: { prebuiltVoiceConfig: { voiceName: config.voiceName || 'Puck' } } 
                   },
-                  systemInstruction: config.systemInstruction,
-                  ...(config.enableTranscription !== false ? { outputAudioTranscription: {} } : {})
-                },
-                contextWindowCompression: { slidingWindow: {} },
+                  systemInstruction: config.systemInstruction
+                }
             };
 
             console.log(`[Session] Config: Transcriptions=${config.enableTranscription !== false}`);
@@ -289,13 +286,13 @@ export function useGeminiSession(callbacks: SessionCallbacks) {
             try {
                 // We access the underlying send method to dispatch a control message
                 // This forces the server VAD to consider the user 'done'
-                if (typeof (sessionRef.current as any).send === 'function') {
-                    (sessionRef.current as any).send({ clientContent: { turnComplete: true } });
+                if (typeof sessionRef.current.sendClientContent === 'function') {
+                    sessionRef.current.sendClientContent({ turnComplete: true });
                     if ((window as any).APP_LOGS_ENABLED) {
                         console.log("%c[Network] 🛑 SENT END_OF_TURN SIGNAL", "color: red; font-weight: bold;");
                     }
                 } else {
-                    console.warn("[Session] send method not available");
+                    console.warn("[Session] sendClientContent method not available");
                 }
             } catch (e) {
                 console.warn("[Session] Failed to send EndTurn signal", e);
@@ -309,19 +306,17 @@ export function useGeminiSession(callbacks: SessionCallbacks) {
             try {
                 // This format forces the model to treat the text as "User Input"
                 // and respond immediately due to turnComplete: true
-                if (typeof (sessionRef.current as any).send === 'function') {
-                    (sessionRef.current as any).send({
-                        clientContent: {
-                            turns: [{
-                                role: 'user',
-                                parts: [{ text: text }]
-                            }],
-                            turnComplete: true
-                        }
+                if (typeof sessionRef.current.sendClientContent === 'function') {
+                    sessionRef.current.sendClientContent({
+                        turns: [{
+                            role: 'user',
+                            parts: [{ text: text }]
+                        }],
+                        turnComplete: true
                     });
                     console.log(`%c[Puppeteer] 📨 Signal sent: ${text}`, "color: fuchsia; font-weight: bold;");
                 } else {
-                    console.warn("[Session] send method not available");
+                    console.warn("[Session] sendClientContent method not available");
                 }
             } catch (e) {
                 console.error("Signal failed", e);

@@ -251,8 +251,8 @@ export function useGeminiLive() {
       try {
           sendAudio(data);
       } catch (e: any) {
-          if (e.message && e.message.includes("send method not available")) {
-              console.warn("[Live] safeSendAudio: send method not available. Skipping.");
+          if (e.message && e.message.includes("sendClientContent method not available")) {
+              console.warn("[Live] safeSendAudio: sendClientContent method not available. Skipping.");
           } else {
               console.error("[Live] safeSendAudio error:", e);
           }
@@ -263,8 +263,8 @@ export function useGeminiLive() {
       try {
           sendEndTurn();
       } catch (e: any) {
-          if (e.message && e.message.includes("send method not available")) {
-              console.warn("[Live] safeSendEndTurn: send method not available. Skipping.");
+          if (e.message && e.message.includes("sendClientContent method not available")) {
+              console.warn("[Live] safeSendEndTurn: sendClientContent method not available. Skipping.");
           } else {
               console.error("[Live] safeSendEndTurn error:", e);
           }
@@ -552,7 +552,7 @@ export function useGeminiLive() {
       if (isHandshakingRef.current) return;
       isHandshakingRef.current = true;
 
-      const apiKey = process.env.API_KEY;
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_API_KEY || process.env.API_KEY || process.env.GEMINI_API_KEY;
       
       // CRITICAL FIX: Inject dynamic variables into custom instruction at runtime
       // IF custom instruction exists, inject. IF NOT, build default from presets.
@@ -592,8 +592,7 @@ export function useGeminiLive() {
               apiKey, 
               systemInstruction: sysInstruct, 
               voiceName: 'Puck',
-              enableTranscription: transcriptionEnabledRef.current,
-              contextWindowCompression: { slidingWindow: {} }
+              enableTranscription: transcriptionEnabledRef.current
           });
           
           if (isWakeup) await new Promise(r => setTimeout(r, 500)); 

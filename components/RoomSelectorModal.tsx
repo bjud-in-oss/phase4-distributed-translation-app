@@ -76,7 +76,11 @@ const RoomSelectorModal: React.FC<RoomSelectorModalProps> = ({
       } else { setMobileFocus('neutral'); }
   };
 
-  const confirmSelection = () => { onSelectRoom(tempSelection); onClose(); };
+  const confirmSelection = (overrideRoom?: string) => { 
+      const roomToSelect = typeof overrideRoom === 'string' ? overrideRoom : tempSelection;
+      onSelectRoom(roomToSelect); 
+      onClose(); 
+  };
 
   const getMobileHeightClass = (section: 'list' | 'map') => {
       if (mobileFocus === 'neutral') return 'h-[50%]';

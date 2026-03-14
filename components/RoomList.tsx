@@ -7,7 +7,7 @@ interface RoomListProps {
   tempSelection: string;
   currentRoom: string;
   onSelect: (roomName: string) => void;
-  onConfirm: () => void;
+  onConfirm: (overrideRoom?: string) => void;
   setMobileFocus: (focus: 'list' | 'map') => void;
 }
 
@@ -92,8 +92,7 @@ const RoomList: React.FC<RoomListProps> = ({
               onClick={() => {
                   const privateRoomId = `privat-${Math.random().toString(36).substring(2, 7)}`;
                   onSelect(privateRoomId);
-                  // Allow state to update before confirming
-                  setTimeout(onConfirm, 0);
+                  onConfirm(privateRoomId);
               }}
               className="w-full text-left px-4 py-3 rounded-lg flex items-center justify-center transition-all border border-dashed border-slate-600 text-slate-400 hover:bg-slate-800 hover:text-white hover:border-slate-500"
           >
