@@ -118,6 +118,28 @@ const Phase4UX: React.FC = () => {
                     </div>
                 </div>
 
+                {/* 6. LÄRDOMAR FRÅN IMPLEMENTATION (GOTCHAS) */}
+                <div className="space-y-4 pt-4 border-t border-slate-800">
+                    <h4 className="text-orange-400 font-bold text-xs uppercase tracking-widest border-l-4 border-orange-500 pl-3">6. Lärdomar från Implementation (Gotchas)</h4>
+                    
+                    <div className="bg-slate-950 p-4 rounded border border-slate-800 space-y-3">
+                        <ul className="text-[11px] text-slate-400 list-disc pl-4 space-y-3">
+                            <li>
+                                <strong className="text-orange-300">COEP & Externa Bilder (QR-koder):</strong> Eftersom vi använder strikta säkerhetsheaders (Cross-Origin-Embedder-Policy: require-corp) för att ljudmotorn ska få maximal prestanda, blockerar webbläsaren externa bilder. Vi kan därför INTE använda externa API:er (som api.qrserver.com) för QR-koder. Vi MÅSTE använda ett lokalt bibliotek (t.ex. <code>react-qr-code</code>) som ritar koden direkt som en SVG/Canvas.
+                            </li>
+                            <li>
+                                <strong className="text-orange-300">API-nycklar & Fallback Chain:</strong> Miljövariabler beter sig olika lokalt (Vite) och i produktion (Netlify/Node). För att göra anslutningen skottsäker MÅSTE vi använda en fallback-kedja vid anslutning: <code>import.meta.env.VITE_GEMINI_API_KEY || process.env.API_KEY</code> etc.
+                            </li>
+                            <li>
+                                <strong className="text-orange-300">Stale Closures vid Rumsbyte:</strong> För att undvika att React skickar in gamla rums-ID:n vid skapandet av Privata Rum (pga asynkrona state-uppdateringar), måste det nya rums-ID:t skickas in direkt som argument till onConfirm-funktionerna, och vi får inte använda setTimeout för att vänta på state.
+                            </li>
+                            <li>
+                                <strong className="text-orange-300">Ljudsäkerhet vid Start:</strong> Applikationen måste ALLTID starta med <code>isLocalAiAudioEnabled = false</code> för att undvika omedelbar rundgång om en vanlig användare råkar starta AI:n.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
                 {/* ARBETSREGEL */}
                 <div className="space-y-4 pt-4 border-t border-slate-800">
                     <div className="bg-red-900/20 p-4 rounded border border-red-500/40">

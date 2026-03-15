@@ -1,5 +1,6 @@
 
 import React, { useRef, useState, useEffect } from 'react';
+import QRCode from 'react-qr-code';
 import { MAP_POINTS, LOCAL_NAME, ListOption } from '../utils/roomData';
 import RoomList from './RoomList';
 import RoomMap, { RoomMapRef } from './RoomMap';
@@ -162,10 +163,10 @@ const RoomSelectorModal: React.FC<RoomSelectorModalProps> = ({
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Dela inbjudan</h3>
               <div className="flex gap-4 items-center">
                   <div className="w-20 h-20 bg-white rounded-lg p-1 shrink-0">
-                      <img 
-                          src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(tempSelection)}&role=listener`)}`} 
-                          alt="QR Code" 
-                          className="w-full h-full object-contain"
+                      <QRCode 
+                          value={`${window.location.origin}${window.location.pathname}?room=${encodeURIComponent(tempSelection)}&role=listener`} 
+                          size={72} 
+                          className="w-full h-full"
                       />
                   </div>
                   <div className="flex-1 min-w-0 flex flex-col justify-center">
