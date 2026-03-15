@@ -29,7 +29,7 @@ export function useAudioEngine() {
     const mergerNodeRef = useRef<ChannelMergerNode | null>(null);
 
     const hardwareMode = useAppStore(state => state.hardwareMode);
-    const [isLocalAiAudioEnabled, setIsLocalAiAudioEnabled] = useState(true);
+    const [isLocalAiAudioEnabled, setIsLocalAiAudioEnabled] = useState(false);
 
     const toggleLocalAiAudio = useCallback(() => {
         setIsLocalAiAudioEnabled(prev => !prev);
