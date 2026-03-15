@@ -80,11 +80,15 @@ export function useGeminiSession(callbacks: SessionCallbacks) {
             const sessionConfig = {
                 model: 'gemini-2.5-flash-native-audio-preview-12-2025',
                 config: {
-                  responseModalities: [Modality.AUDIO], 
+                  responseModalities: ["AUDIO"],
                   speechConfig: { 
                       voiceConfig: { prebuiltVoiceConfig: { voiceName: config.voiceName || 'Puck' } } 
                   },
-                  systemInstruction: config.systemInstruction
+                  systemInstruction: config.systemInstruction,
+                  ...(config.enableTranscription !== false ? {
+                      outputAudioTranscription: {},
+                      inputAudioTranscription: {}
+                  } : {})
                 }
             };
 
@@ -284,15 +288,10 @@ export function useGeminiSession(callbacks: SessionCallbacks) {
         // AI FIX: Added safety check for send method
         if (sessionRef.current) {
             try {
-                // We access the underlying send method to dispatch a control message
-                // This forces the server VAD to consider the user 'done'
-                if (typeof sessionRef.current.sendClientContent === 'function') {
-                    sessionRef.current.sendClientContent({ turnComplete: true });
-                    if ((window as any).APP_LOGS_ENABLED) {
-                        console.log("%c[Network] 🛑 SENT END_OF_TURN SIGNAL", "color: red; font-weight: bold;");
-                    }
-                } else {
-                    console.warn("[Session] sendClientContent method not available");
+                // The 12-2025 model does not support empty turnComplete signals via sendClientContent.
+                // We rely on the Silence Burst (sent right before this) to trigger the VAD instead.
+                if ((window as any).APP_LOGS_ENABLED) {
+                    console.log("%c[Network] 🛑 SKIPPED END_OF_TURN SIGNAL (Incompatible with 12-2025 model)", "color: orange; font-weight: bold;");
                 }
             } catch (e) {
                 console.warn("[Session] Failed to send EndTurn signal", e);
